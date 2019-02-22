@@ -15,33 +15,27 @@ import com.example.demo.service.UserService;
 import java.util.UUID;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserDao userDao;
 
-	
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-
-
 	@Override
 	public ResponseEntity<Object> login(String username, String password) throws Exception {
-		UserEntity userEntity=userDao.findByUserName(username);
-		System.out.println(userEntity);
-		System.out.println(password);
-		if (bCryptPasswordEncoder.matches(password,userEntity.getPassword())){
+		UserEntity userEntity = userDao.findByUserName(username);
+		
+		if (bCryptPasswordEncoder.matches(password, userEntity.getPassword())) {
 
-			 String token=jwtTokenProvider.createToken(username);
-			return new ResponseEntity<Object>(token,HttpStatus.OK);
+			String token = jwtTokenProvider.createToken(username,userEntity.getRoles());
+			return new ResponseEntity<Object>(token, HttpStatus.OK);
 		}
-		return new ResponseEntity<Object>("null",HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<Object>("null", HttpStatus.BAD_REQUEST);
 	}
-
-
 
 }
